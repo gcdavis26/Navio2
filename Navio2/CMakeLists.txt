@@ -8,5 +8,5 @@ Navio2/RCOutput_Navio2.cpp
 Navio2/RGBled.cpp
 )
 target_include_directories(Navio2 PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/Navio2
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )

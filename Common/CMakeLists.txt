@@ -7,5 +7,5 @@ Ublox.cpp
 Util.cpp
 )
 target_include_directories(Common PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/Common
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
