@@ -70,39 +70,53 @@ bool LSM9DS1::probe()
 
 bool LSM9DS1::initialize()
 {
-    //--------Accelerometer and Gyroscope---------
-    // enable the 3-axes of the gyroscope
-    WriteReg(DEVICE_ACC_GYRO, LSM9DS1XG_CTRL_REG4, BITS_XEN_G |
-                                                BITS_YEN_G |
-                                                BITS_ZEN_G);
-    // configure the gyroscope
-    WriteReg(DEVICE_ACC_GYRO, LSM9DS1XG_CTRL_REG1_G, BITS_ODR_G_952HZ |
-                                                  BITS_FS_G_2000DPS);
+    // -------------------------------------------------------------------------
+    // GYROSCOPE SETUP
+    // -------------------------------------------------------------------------
+
+    // Enable all 3 axes (X, Y, Z)
+    WriteReg(DEVICE_ACC_GYRO, LSM9DS1XG_CTRL_REG4, BITS_XEN_G | BITS_YEN_G | BITS_ZEN_G);
+
+    // Configure Gyro: High Sample Rate (952Hz) + LOWEST Range (245DPS)
+    // We use 245DPS for maximum sensitivity (lowest noise)
+    WriteReg(DEVICE_ACC_GYRO, LSM9DS1XG_CTRL_REG1_G, BITS_ODR_G_952HZ | BITS_FS_G_245DPS);
+
     usleep(200);
 
-    // enable the three axes of the accelerometer
-    WriteReg(DEVICE_ACC_GYRO, LSM9DS1XG_CTRL_REG5_XL, BITS_XEN_XL |
-                                                   BITS_YEN_XL |
-                                                   BITS_ZEN_XL);
-    // configure the accelerometer-specify bandwidth selection with Abw
-    WriteReg(DEVICE_ACC_GYRO, LSM9DS1XG_CTRL_REG6_XL, BITS_ODR_XL_952HZ |
-                                                   BITS_FS_XL_16G);
+    // -------------------------------------------------------------------------
+    // ACCELEROMETER SETUP
+    // -------------------------------------------------------------------------
+
+    // Enable all 3 axes (X, Y, Z)
+    WriteReg(DEVICE_ACC_GYRO, LSM9DS1XG_CTRL_REG5_XL, BITS_XEN_XL | BITS_YEN_XL | BITS_ZEN_XL);
+
+    // Configure Accel: High Sample Rate (952Hz) + MEDIUM Range (+/- 4G)
+    // We use 4G to prevent clipping from drone vibrations, while keeping good precision
+    WriteReg(DEVICE_ACC_GYRO, LSM9DS1XG_CTRL_REG6_XL, BITS_ODR_XL_952HZ | BITS_FS_XL_4G);
+
     usleep(200);
 
-    //------------Magnetometer----------------
-    WriteReg(DEVICE_MAGNETOMETER, LSM9DS1M_CTRL_REG1_M, BITS_TEMP_COMP |
-                                            BITS_OM_HIGH |
-                                            BITS_ODR_M_80HZ);
+    // -------------------------------------------------------------------------
+    // MAGNETOMETER SETUP (Standard)
+    // -------------------------------------------------------------------------
+
+    WriteReg(DEVICE_MAGNETOMETER, LSM9DS1M_CTRL_REG1_M, BITS_TEMP_COMP | BITS_OM_HIGH | BITS_ODR_M_80HZ);
     WriteReg(DEVICE_MAGNETOMETER, LSM9DS1M_CTRL_REG2_M, BITS_FS_M_16Gs);
-    // continuous conversion mode
     WriteReg(DEVICE_MAGNETOMETER, LSM9DS1M_CTRL_REG3_M, BITS_MD_CONTINUOUS);
     WriteReg(DEVICE_MAGNETOMETER, LSM9DS1M_CTRL_REG4_M, BITS_OMZ_HIGH);
-    WriteReg(DEVICE_MAGNETOMETER, LSM9DS1M_CTRL_REG5_M, 0x00 );
+    WriteReg(DEVICE_MAGNETOMETER, LSM9DS1M_CTRL_REG5_M, 0x00);
+
     usleep(200);
 
-    set_gyro_scale(BITS_FS_G_2000DPS);
-    set_acc_scale(BITS_FS_XL_16G);
+    // -------------------------------------------------------------------------
+    // UPDATE INTERNAL SCALES
+    // -------------------------------------------------------------------------
+    // Critical: These must match the registers above so the math works correctly.
+
+    set_gyro_scale(BITS_FS_G_245DPS);
+    set_acc_scale(BITS_FS_XL_4G);     // <--- Updated to 4G
     set_mag_scale(BITS_FS_M_16Gs);
+
     return true;
 }
 
