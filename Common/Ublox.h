@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 #include <vector>
 #include "SPIdev.h"
+#include <cstdint>
 
 #define PACKED __attribute__((__packed__))
 
